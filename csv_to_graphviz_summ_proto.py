@@ -1,15 +1,13 @@
 #!/usr/bin/python
 """
-python csvs_to_graphvis_prototype.py weighted=False colored=True > gold.nw.color.1.dot
+python csvs_to_graphviz_summ_proto.py weighted=False colored=True > gold.nw.color.1.dot
 dot -Tpdf gold.nw.color.1.dot -o gold.nw.color.1.dot.pdf
-
-python csvs_to_graphvis_prototype.py weighted=True colored=True > gold.w.color.1.dot
-fdp -Tpdf gold.w.color.1.dot -o gold.w.color.1.fpd.pdf
 
 """
 import numpy as np
 import matrix_io as mio
 import sys
+
 
 EDGES = '"%s" -> "%s"'
 FONT_STRING = """
