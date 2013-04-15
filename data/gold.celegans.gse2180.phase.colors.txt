@@ -1,0 +1,24 @@
+#\definecolor{Class1}{rgb}{0.65,0.38,0.10}       % #A6611A
+#\definecolor{Class2}{rgb}{0.91,0.76,0.49}       % #DFC27D
+#\definecolor{Class3}{rgb}{0.50,0.80,0.76}       % #80CDC1
+#\definecolor{Class4}{rgb}{0.01,0.52,0.44}       % #018571
+#\definecolor{ClassNA}{rgb}{0.375,0.375,0.375}   % #666666
+tbx-9 190539_s_at;#DFC27D
+scrt-1 192307_at;#DFC27D
+pal-1 174043_at;#A6611A
+pal-1 193341_at;#A6611A
+pal-1 193342_s_at;#A6611A
+lin-26 190309_at;#666666
+lin-26 174037_at;#666666
+cwn-1 188486_s_at;#DFC27D
+elt-1 192655_s_at;#DFC27D
+hnd-1 192707_at;#DFC27D
+tbx-8 190477_at;#DFC27D
+mab-21 188239_s_at;#018571
+elt-3 175801_at;#80CDC1
+nob-1 191468_s_at;#80CDC1
+nhr-25 175663_at;#80CDC1
+unc-120 188706_at;#80CDC1
+hlh-1 193759_at;#80CDC1
+nhr-25 193001_s_at;#80CDC1
+nob-1 175771_at;#80CDC1
