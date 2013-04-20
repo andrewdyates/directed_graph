@@ -3,6 +3,10 @@
 
 EXAMPLE USE:
 python script.py min_d=0.33 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab outpath_prefix=~/Desktop/gold_0.33 color_fname=data/gold.celegans.phase.colors.genes.txt
+
+python script.py min_d=0.33 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab outpath_prefix=~/Desktop/gold_0.33_nw color_fname=data/gold.celegans.phase.colors.genes.txt weighted=False
+
+python script.py min_d=0.33 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab outpath_prefix=~/Desktop/gold_0.33_fdp color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd="fdp" 
 """
 import matrix_io as mio
 from __init__ import *
