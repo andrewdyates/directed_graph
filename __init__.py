@@ -53,14 +53,15 @@ def print_graphviz(names, out=sys.stdout, node_styles=None, graph_type="digraph"
       print >>out, '"%s" [%s]' % (node_name, node_style_dict_to_str(style_d))
   # Print edges
   for d in yield_matrix_to_edge_dict(names, **kwds):
-    print >>out, edge_attr_to_line(d)
+    if d:
+      print >>out, edge_attr_to_line(d)
   # Print footer.
   if postfix: print >>out, postfix
   print >>out, "}"
 
 def yield_matrix_to_edge_dict(names=None, CLS=None, DCOR=None, WEAK=None, min_d=0.3, weighted=True, plot_na=False):
-  """Yield graphviz lines from edge matrices and list of names."""
-  assert names and CLS and DCOR
+  """Yield graphviz edge dict from adj matrices and list of names. Return None if no edge."""
+  assert names is not None and CLS is not None and DCOR is not None
   assert np.size(CLS,0) == np.size(CLS,1)
   assert np.shape(CLS) == np.shape(DCOR)
   assert len(names) == np.size(CLS,0)

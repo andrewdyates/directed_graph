@@ -1,0 +1,19 @@
+#\definecolor{Class1}{rgb}{0.65,0.38,0.10}       % #A6611A
+#\definecolor{Class2}{rgb}{0.91,0.76,0.49}       % #DFC27D
+#\definecolor{Class3}{rgb}{0.50,0.80,0.76}       % #80CDC1
+#\definecolor{Class4}{rgb}{0.01,0.52,0.44}       % #018571
+#\definecolor{ClassNA}{rgb}{0.375,0.375,0.375}   % #666666
+tbx-9;#DFC27D
+scrt-1;#DFC27D
+pal-1;#A6611A
+lin-26;#666666
+cwn-1;#DFC27D
+elt-1;#DFC27D
+hnd-1;#DFC27D
+tbx-8;#DFC27D
+mab-21;#018571
+elt-3;#80CDC1
+nob-1;#80CDC1
+nhr-25;#80CDC1
+unc-120;#80CDC1
+hlh-1;#80CDC1
