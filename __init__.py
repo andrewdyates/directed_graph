@@ -6,6 +6,8 @@ import sys
 
 # boolean class enumation key
 BOOL_ENUM = {0:'NA', 1:'XiY', 2:'PC', 3:'YiX', 4:'UNL', 5:'MX', 6:'NC', 7:'OR'}
+# 0: no class; 1: and; 2: rn4c (row necessary for col); 3: cn4r (col necessary for row); 4: xor; 5: mix
+WEAK_ENUM = {0:'nc', 1:'and', 2:'rn4c', 3:'cn4r', 4:'xor', 5:'mix'}
 
 # GRAPHVIZ TEMPLATES
 FONT_STRING = """graph [fontname = "helvetica"];
@@ -115,8 +117,15 @@ def get_edge_dict(rowname, colname, cls, dcor, weak_cls=None, min_dcor=0, plot_n
   if cls == 3: # edge goes opposite direction
     d['source'] = colname; d['dest'] = rowname
   elif cls == 4 and weak_cls is not None:
-    pass     # this is not yet implemented
-  else:      # edge goes from row to column (or is undirected)
+    # WEAK_ENUM = {0:'nc', 1:'and', 2:'rn4c', 3:'cn4r', 4:'xor', 5:'mix'}
+    if weak_cls == 0 or weak_cls == 4: # no class or xor: no edge
+      return None
+    elif weak_cls == 3: # 3:cn4r
+      d['source'] = colname; d['dest'] = rowname
+    else:
+      d['source'] = rowname; d['dest'] = colname
+  else:
+    # edge goes from row to column (or is undirected)
     d['source'] = rowname; d['dest'] = colname
 
   # Edge Attributes
@@ -130,9 +139,14 @@ def get_edge_dict(rowname, colname, cls, dcor, weak_cls=None, min_dcor=0, plot_n
     d['attr'].update({'dir':"none", "constraint":"false"})
   elif cls == 4:
     if weak_cls is not None:
-      pass # this is not yet implemented
+      # necessary direction edges
+      if weak_cls == 2 or weak_cls == 3:
+        d['attr'].update({"style":"dashed"})
+      else:
+        d['attr'].update({'dir':"none", "constraint":"false", "style":"dashed"})
     else:
       d['attr'].update({'dir':"none", "constraint":"false", "style":"dashed"})
+      
   # RETURN EDGE DICT
   return d
 
