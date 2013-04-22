@@ -46,8 +46,48 @@ def node_style_dict_to_str(d):
   s = ", ".join(('%s="%s"'%(k,v) for k,v in d.items()))
   return s
 
+def edge_list_to_adjM_dict(G):
+  """Return A[source][dest] adj matrix."""
+  A = {}
+  nodes = G['nodes']
+  for s in sorted(nodes):
+    A[s] = {}
+  for e in G['edges']:
+    s,d = e['source'], e['dest']
+    A[s][d] = e
+    if not e['directed']:
+      A[d][s] = e
+  return A
+
+def edge_list_to_adjMs(G):
+  """Export graph dict returned from print_graphviz to csv."""
+  A = edge_list_to_adjM_dict(G)
+  nodes = G['nodes']
+  node_idx = dict(( (s,i) for i,s in enumerate(nodes) ))
+  n = len(nodes)
+  Adj = np.zeros((n,n), dtype=np.bool)
+  Weak = np.zeros((n,n), dtype=np.bool)
+  Cor = np.zeros((n,n), dtype=np.bool)
+  for s in A:
+    for d,e in A[s].items():
+      i,j = node_idx[s], node_idx[d]
+      Adj[i,j] = True
+      if e['cls'] == 2:
+        Cor[i,j] = True; Cor[j,i] = True
+      if e['cls'] == 4:
+        Weak[i,j] = True; Weak[j,i] = True
+  return {'Adj':Adj, 'nodes':nodes, 'Cor':Cor, 'Weak':Weak}
+
+def adjM_to_out(out, Adj, nodes):
+  """Print Adjacency matrix to out as csv."""
+  print >>out, ",".join([""]+nodes)
+  for i, row in enumerate(Adj):
+    r = [str(int(r)) for r in row]
+    print >>out, ",".join([nodes[i]]+r)
+  
 def print_graphviz(names, out=sys.stdout, node_styles=None, graph_type="digraph", prefix="", postfix="", **kwds):
   """Print graphviz output to `out` stream.
+  Return dict of edge and node representation
   See `yield_matrix_to_edge_dict` for additional options passed via **kwds.
   """
   # Print header.
@@ -62,14 +102,17 @@ def print_graphviz(names, out=sys.stdout, node_styles=None, graph_type="digraph"
         print >>sys.stderr, "WARNING: node name %s not in list of edge names." % node_name
       print >>out, '"%s" [%s]' % (node_name, node_style_dict_to_str(style_d))
   # Print edges
+  G = {'nodes':names, 'edges':[]}
   for d in yield_matrix_to_edge_dict(names, **kwds):
     if d:
       print >>out, edge_attr_to_line(d)
+      G['edges'].append(d)
   # Print footer.
   if postfix: print >>out, postfix
   print >>out, "}"
+  return G
 
-def yield_matrix_to_edge_dict(names=None, CLS=None, DCOR=None, WEAK=None, min_d=0.3, weighted=True, plot_na=False):
+def yield_matrix_to_edge_dict(names=None, CLS=None, DCOR=None, WEAK=None, min_d=0.3, weighted=True, plot_na=False, **kwds):
   """Yield graphviz edge dict from adj matrices and list of names. Return None if no edge."""
   assert names is not None and CLS is not None and DCOR is not None
   assert np.size(CLS,0) == np.size(CLS,1)
@@ -121,20 +164,33 @@ def get_edge_dict(rowname, colname, cls, dcor, weak_cls=None, min_dcor=0, plot_n
     
   # Edge Direction
   # ------------------------------
-  d = {}
-  if cls == 3: # edge goes opposite direction
+  d = {'cls':int(cls), 'dcor':dcor, 'weak':int(weak_cls), 'is_weak':False}
+  if cls == 1:
+    d['source'] = rowname; d['dest'] = colname
+    d['directed'] = True
+  elif cls == 3: # edge goes opposite direction
     d['source'] = colname; d['dest'] = rowname
+    d['directed'] = True
   elif cls == 4 and weak_cls is not None:
     # WEAK_ENUM = {0:'nc', 1:'and', 2:'rn4c', 3:'cn4r', 4:'xor', 5:'mix'}
     if weak_cls == 0 or weak_cls == 4: # no class or xor: no edge
       return None
     elif weak_cls == 3: # 3:cn4r
       d['source'] = colname; d['dest'] = rowname
-    else:
+      d['directed'] = True
+      d['is_weak'] = True
+    elif weak_cls == 2:
+      d['directed'] = True
       d['source'] = rowname; d['dest'] = colname
+      d['is_weak'] = True
+    else:
+      d['directed'] = False
+      d['source'] = rowname; d['dest'] = colname
+      d['is_weak'] = True
   else:
     # edge goes from row to column (or is undirected)
     d['source'] = rowname; d['dest'] = colname
+    d['directed'] = False
 
   # Edge Attributes
   # ------------------------------

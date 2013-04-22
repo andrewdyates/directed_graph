@@ -55,20 +55,35 @@ def matrix_files_to_flat_graphviz_file(cls_fname=None, dcor_fname=None, out_fnam
     WEAK = None
   
   out = open(out_fname, "w")
-  print_graphviz(names=names, out=out, CLS=CLS, DCOR=DCOR, WEAK=WEAK, node_styles=node_styles, min_d=min_d, weighted=weighted, plot_na=plot_na, **kwds)
+  G = print_graphviz(names=names, out=out, CLS=CLS, DCOR=DCOR, WEAK=WEAK, node_styles=node_styles, min_d=min_d, weighted=weighted, plot_na=plot_na, **kwds)
   out.close()
-  return out_fname
+  return G
+
   
 def make_and_compile(outpath_prefix=None, output_type="pdf", graphviz_cmd="dot", **kwds):
   assert outpath_prefix
   out_fname = outpath_prefix+".dot"
   print "Generating graphviz .dot text file as %s..." % out_fname
-  matrix_files_to_flat_graphviz_file(out_fname=out_fname, **kwds)
+  G = matrix_files_to_flat_graphviz_file(out_fname=out_fname, **kwds)
+  D = edge_list_to_adjMs(G)
+  
+  adj_fname = outpath_prefix+".adj.csv"  
+  print "Saving graph adjacency matrix to file, col source to row, to %s" % adj_fname
+  adjM_to_out(open(adj_fname,"w"), D['Adj'].T, D['nodes'])
+
+  weak_fname = outpath_prefix+".weak.csv"  
+  print "Saving graph weak flag to file, col source to row, to %s" % weak_fname
+  adjM_to_out(open(weak_fname,"w"), D['Weak'].T, D['nodes'])
+
+  cor_fname = outpath_prefix+".cor.csv"  
+  print "Saving graph weak flag to file, col source to row, to %s" % cor_fname
+  adjM_to_out(open(cor_fname,"w"), D['Cor'].T, D['nodes'])
+  
   plot_fname = "%s.%s" % (out_fname, output_type)
   cmd = "%s -T%s %s -o %s" % (graphviz_cmd, output_type, out_fname, plot_fname)
   print "Plotting graph using command [%s]..." % cmd
-  r = subprocess.call(cmd, shell=True)
-  print r
+  subprocess.call(cmd, shell=True)
+  
 
 
 if __name__ == "__main__":
