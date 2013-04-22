@@ -8,11 +8,13 @@ python script.py min_d=0.33 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname
 
 python script.py min_d=0.33 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab outpath_prefix=~/Desktop/gold_0.33_fdp color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=fdp
 
-# with weaks
+# with weaks, fdp
 python script.py min_d=0.30 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab outpath_prefix=~/Desktop/gold_0.30_fdp color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=fdp weak_fname=data/gold.weak.tab
 
+# with weaks, no weight, dot
 python script.py min_d=0.30 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weak_fname=data/gold.weak.tab weighted=False outpath_prefix=~/Desktop/gold_0.30_dot_nw
 
+# with weaks, weights, dot
 python script.py min_d=0.30 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weak_fname=data/gold.weak.tab outpath_prefix=~/Desktop/gold_0.30_dot
 
 python script.py min_d=0.30 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weak_fname=data/gold.weak.tab outpath_prefix=~/Desktop/gold_0.30_dot groups_fname=data/gold.k7.hclust.csv
@@ -76,7 +78,7 @@ def make_and_compile(outpath_prefix=None, output_type="pdf", graphviz_cmd="dot",
   adjM_to_out(open(weak_fname,"w"), D['Weak'].T, D['nodes'])
 
   cor_fname = outpath_prefix+".cor.csv"  
-  print "Saving graph weak flag to file, col source to row, to %s" % cor_fname
+  print "Saving graph PC glyph correlated flag to file, col source to row, to %s" % cor_fname
   adjM_to_out(open(cor_fname,"w"), D['Cor'].T, D['nodes'])
   
   plot_fname = "%s.%s" % (out_fname, output_type)

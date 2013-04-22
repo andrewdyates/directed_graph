@@ -41,6 +41,7 @@ def load_colors_as_node_style_dict(fp):
   return dict(q)
 
 def node_style_dict_to_str(d):
+  """Return graphviz string for node style dict."""
   d.setdefault("style", "filled")
   d.setdefault("fontcolor", "white")
   s = ", ".join(('%s="%s"'%(k,v) for k,v in d.items()))
@@ -94,19 +95,20 @@ def print_graphviz(names, out=sys.stdout, node_styles=None, graph_type="digraph"
   print >>out, "%s {" % (graph_type)
   if prefix: print >>out, prefix
   print >>out, FONT_STRING
-  # Print node styles.
-  if node_styles is not None:
-    name_set = set(names)
-    for node_name, style_d in node_styles.items():
-      if node_name not in name_set:
-        print >>sys.stderr, "WARNING: node name %s not in list of edge names." % node_name
-      print >>out, '"%s" [%s]' % (node_name, node_style_dict_to_str(style_d))
+  # Print node list, add style if it exists.
+  for node_name in names:
+    if node_styles is not None and node_name in node_styles:
+      style_d = node_styles[node_name]
+      print >>out, '"%s" [%s];' % (node_name, node_style_dict_to_str(style_d))
+    else:
+      print >>out, '"%s";' % (node_name)
   # Print edges
   G = {'nodes':names, 'edges':[]}
-  for d in yield_matrix_to_edge_dict(names, **kwds):
-    if d:
-      print >>out, edge_attr_to_line(d)
-      G['edges'].append(d)
+  if len(names) > 1:
+    for d in yield_matrix_to_edge_dict(names, **kwds):
+      if d:
+        print >>out, edge_attr_to_line(d)
+        G['edges'].append(d)
   # Print footer.
   if postfix: print >>out, postfix
   print >>out, "}"
@@ -121,7 +123,7 @@ def yield_matrix_to_edge_dict(names=None, CLS=None, DCOR=None, WEAK=None, min_d=
   if WEAK is not None:
     assert np.shape(CLS) == np.shape(WEAK)
   n = np.size(CLS,0)
-  assert n>=1
+  assert n>1
   for i in xrange(n-1):
     for j in xrange(i+1,n):
       cls, dcor = CLS[i,j], DCOR[i,j]

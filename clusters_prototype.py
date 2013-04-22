@@ -36,7 +36,6 @@ for i, vs in enumerate(C):
   DCOR_i = DCOR[idxs,:][:,idxs]
   WEAK_i = WEAK[idxs,:][:,idxs]
   names_i = node_names_np[idxs]
-  print '!!!', names_i, CLS_i, DCOR_i, WEAK_i
   G = print_graphviz(names=names_i, out=open(clust_out,"w"), CLS=CLS_i, DCOR=DCOR_i, WEAK=WEAK_i, min_d=0.3, weighted=True)
   cmd = "%s -T%s %s -o %s" % ("dot", "pdf", clust_out, clust_out+".pdf")
   print "Plotting graph using command [%s]..." % cmd
@@ -54,6 +53,3 @@ fp.close()
 cmd = "%s -T%s %s -o %s" % ("dot", "pdf", clust_out, clust_out+".pdf")
 print "Plotting graph using command [%s]..." % cmd
 print subprocess.call(cmd, shell=True)
-
-# TO FIX: remove node styles if nodes are missing. Abbr warning message
-# TO FIX: plot single nodes without edges
