@@ -14,7 +14,6 @@ WEAK_ENUM = {0:'nc', 1:'and', 2:'rn4c', 3:'cn4r', 4:'xor', 5:'mix'}
 FONT_STRING = """graph [fontname = "helvetica"];
 node [fontname = "helvetica"];
 edge [fontname = "helvetica", penwidth=1];"""
-DFT_PTN_NODE_STYLE = '"%s"[color="%s",style=filled,fontcolor=white]'
 
 def str_true_false(s):
   if not s:
@@ -41,10 +40,11 @@ def load_colors_as_node_style_dict(fp):
     q[node] = {'color':color}
   return dict(q)
 
-def node_style_dict_to_str(d):
+def node_style_dict_to_str(d, is_filled=True):
   """Return graphviz string for node style dict."""
-  d.setdefault("style", "filled")
-  d.setdefault("fontcolor", "white")
+  if is_filled:
+    d.setdefault("style", "filled")
+    d.setdefault("fontcolor", "white")
   s = ", ".join(('%s="%s"'%(k,v) for k,v in d.items()))
   return s
 
@@ -104,19 +104,18 @@ def print_graphviz(names, out=sys.stdout, node_styles=None, graph_type="digraph"
       # default pdf dpi is 72px/in
       w,h=cluster_sizes[i]
       style_d = {'width': str(w/72), 'height':str(h/72), 'shape':'box', 'peripheries':'2'}
-      print style_d, w,h
     else:
       style_d = {}
     if node_styles is not None and node_name in node_styles:
       style_d.update(node_styles[node_name])
     if style_d:
-      print >>out, '"%s" [%s];' % (node_name, node_style_dict_to_str(style_d))
+      print >>out, '"%s" [%s];' % (node_name, node_style_dict_to_str(style_d, not as_clusters))
     else:
       print >>out, '"%s";' % (node_name)
   # Print edges
   G = {'nodes':names, 'edges':[]}
   if len(names) > 1:
-    for d in yield_matrix_to_edge_dict(names, **kwds):
+    for d in yield_matrix_to_edge_dict(names=names, as_clusters=as_clusters, **kwds):
       if d:
         print >>out, edge_attr_to_line(d)
         G['edges'].append(d)
@@ -125,7 +124,7 @@ def print_graphviz(names, out=sys.stdout, node_styles=None, graph_type="digraph"
   print >>out, "}"
   return G
 
-def yield_matrix_to_edge_dict(names=None, CLS=None, DCOR=None, WEAK=None, min_d=0.3, weighted=True, plot_na=False, **kwds):
+def yield_matrix_to_edge_dict(names=None, CLS=None, DCOR=None, WEAK=None, min_d=0.3, weighted=True, plot_na=False, as_clusters=False, **kwds):
   """Yield graphviz edge dict from adj matrices and list of names. Return None if no edge."""
   assert names is not None and CLS is not None and DCOR is not None
   assert np.size(CLS,0) == np.size(CLS,1)
@@ -148,7 +147,7 @@ def yield_matrix_to_edge_dict(names=None, CLS=None, DCOR=None, WEAK=None, min_d=
         weight = None
       d = get_edge_dict(\
             rowname=names[i], colname=names[j], cls=cls, dcor=dcor,\
-            weak_cls=weak, min_dcor=min_d, plot_na=plot_na, weight=weight)
+            weak_cls=weak, min_dcor=min_d, plot_na=plot_na, weight=weight, as_clusters=as_clusters)
       yield d
 
 def edge_attr_to_line(d):
@@ -157,7 +156,7 @@ def edge_attr_to_line(d):
   a = ", ".join(("%s=%s"%(k,v) for k,v in d['attr'].items()))
   return "%s[%s];" % (e,a)
     
-def get_edge_dict(rowname, colname, cls, dcor, weak_cls=None, min_dcor=0, plot_na=False, weight=None):
+def get_edge_dict(rowname, colname, cls, dcor, weak_cls=None, min_dcor=0, plot_na=False, weight=None, as_clusters=False):
   """Return an attribute dict describing an edge. Return None if no edge."""
   assert cls in BOOL_ENUM.keys(); assert dcor >= 0 and dcor <= 1;
   assert min_dcor >= 0 and min_dcor <= 1
@@ -170,14 +169,14 @@ def get_edge_dict(rowname, colname, cls, dcor, weak_cls=None, min_dcor=0, plot_n
   # ------------------------------
   if not plot_na and cls == 0:
     return None
-  if cls not in (0,1,2,3,4):
+  if cls not in (0,1,2,3,4) and not as_clusters:
     return None
   if dcor < min_dcor:
     return None
     
   # Edge Direction
   # ------------------------------
-  d = {'cls':int(cls), 'dcor':dcor, 'weak':int(weak_cls), 'is_weak':False}
+  d = {'cls':int(cls), 'dcor':dcor, 'weak':int(weak_cls), 'is_weak':False, 'cluster_edge':as_clusters}
   if cls == 1:
     d['source'] = rowname; d['dest'] = colname
     d['directed'] = True
@@ -207,7 +206,7 @@ def get_edge_dict(rowname, colname, cls, dcor, weak_cls=None, min_dcor=0, plot_n
 
   # Edge Attributes
   # ------------------------------
-  d['attr'] = {"penwidth":penwidth(cls,dcor), "color":'"%s"'%edgecolor(cls,dcor)}
+  d['attr'] = {"penwidth":penwidth(cls,dcor,scale=as_clusters), "color":'"%s"'%edgecolor(cls,dcor)}
   if weight is not None:
     d['attr']["weight"] = weight
   if cls == 0:
@@ -223,22 +222,31 @@ def get_edge_dict(rowname, colname, cls, dcor, weak_cls=None, min_dcor=0, plot_n
         d['attr'].update({'dir':"none", "constraint":"false", "style":"dashed"})
     else:
       d['attr'].update({'dir':"none", "constraint":"false", "style":"dashed"})
+  elif cls in (5,6,7):
+    d['attr'].update({'dir':"none", "constraint":"false"})
+  elif cls in (1,3):
+    pass
+  else:
+    raise Exception, "Unrecognized class %s" % cls
       
   # RETURN EDGE DICT
   return d
 
-def penwidth(c,d):
+def penwidth(c,d,scale):
   """Return an edge pen width string from class `c` and dcor `d`."""
   assert c in BOOL_ENUM.keys(); assert d >= 0 and d <= 1
   if c==1 or c==3 or c==4:
-    if d > 0.85:   return "1.5"
-    else:          return "1.0"
+    if d > 0.85:   w = 1.5
+    else:          w = 1.0
   elif c == 2:
-    if d > 0.9:    return "2.5"
-    elif d > 0.8:  return "2.0"
-    else:          return "1.5"
+    if d > 0.9:    w = 2.5
+    elif d > 0.8:  w = 2.0
+    else:          w = 1.5
   else:
-    return "1.0"
+    w = 1.0
+  if scale:
+    w = w*((1+d)**3)-0.5
+  return "%f"%w
 
 def edgecolor(c,d):
   """Return an edge color string from class `c` and dcor `d`."""
@@ -251,6 +259,12 @@ def edgecolor(c,d):
     else:         return "#64acd4" # light blue
   elif c == 4:
     return "#888888"
+  elif c == 5:
+    return "#a00d42"
+  elif c == 6:
+    return "#d7424c"
+  elif c == 7:
+    return "#eb6532"
   else:           # All other edges
     return "#222222"   # almost black
 
