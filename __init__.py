@@ -1,6 +1,7 @@
 #!/usr/bin/python
 """Convert matrices into graphviz .dot files.
 """
+from __future__ import division
 import numpy as np
 import sys
 
@@ -86,7 +87,7 @@ def adjM_to_out(out, Adj, nodes):
     r = [str(int(r)) for r in row]
     print >>out, ",".join([nodes[i]]+r)
   
-def print_graphviz(names, out=sys.stdout, node_styles=None, graph_type="digraph", prefix="", postfix="", **kwds):
+def print_graphviz(names, out=sys.stdout, node_styles=None, graph_type="digraph", prefix="", postfix="", cluster_sizes=None, **kwds):
   """Print graphviz output to `out` stream.
   Return dict of edge and node representation
   See `yield_matrix_to_edge_dict` for additional options passed via **kwds.
@@ -95,10 +96,20 @@ def print_graphviz(names, out=sys.stdout, node_styles=None, graph_type="digraph"
   print >>out, "%s {" % (graph_type)
   if prefix: print >>out, prefix
   print >>out, FONT_STRING
+  # Flag for plotting as clusters or not.
+  as_clusters = cluster_sizes is not None
   # Print node list, add style if it exists.
-  for node_name in names:
+  for i, node_name in enumerate(names):
+    if as_clusters:
+      # default pdf dpi is 72px/in
+      w,h=cluster_sizes[i]
+      style_d = {'width': str(w/72), 'height':str(h/72), 'shape':'box', 'peripheries':'2'}
+      print style_d, w,h
+    else:
+      style_d = {}
     if node_styles is not None and node_name in node_styles:
-      style_d = node_styles[node_name]
+      style_d.update(node_styles[node_name])
+    if style_d:
       print >>out, '"%s" [%s];' % (node_name, node_style_dict_to_str(style_d))
     else:
       print >>out, '"%s";' % (node_name)

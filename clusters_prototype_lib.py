@@ -1,5 +1,7 @@
 from __future__ import division
 from __init__ import *
+# from https://github.com/knowah/PyPDF2/
+from PyPDF2 import PdfFileReader
 
 # BOOL_ENUM = {0:'NA', 1:'XiY', 2:'PC', 3:'YiX', 4:'UNL', 5:'MX', 6:'NC', 7:'OR'}
 # WEAK_ENUM = 0: no class; 1: and; 2: rn4c; 3: cn4r; 4: xor; 5: mix
@@ -236,3 +238,10 @@ def compress_weak(CLUST_i, WEAK, **kwds):
       elif w == 3:
         COMP[i,j] = 3; COMP[j,i] = 2
   return COMP
+
+
+def get_pdf_file_size(pdf_fname):
+  """Return pdf (width,height) in pixels."""
+  pdf = PdfFileReader(open(pdf_fname,"rb"))
+  mbox = pdf.getPage(0).mediaBox
+  return mbox[2], mbox[3]
