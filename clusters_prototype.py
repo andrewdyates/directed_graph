@@ -18,22 +18,18 @@ WEAK_D = mio.load(weak_fname)
 CLS = CLS_D['M']
 DCOR = DCOR_D['M']
 WEAK = WEAK_D['M']
-names = CLS_D['row_ids']
+node_names = CLS_D['row_ids']
 CLUSTS = load_clusters(open(clusts_fname))
 
 # Convert cluster names into row IDs (indexed from zero)
-C = clust_names_to_row_nums(CLUSTS, names)
+C, clust_names = clust_names_to_row_num_list(CLUSTS, node_names)
 
-# break CLS, DCOR, and WEAK into inter-intra clusters
-# collapse CLS, DCOR, and WEAK into composite cluster matrices, then plot
-# for each cluster, extract each, then plot
-
-clust_names = sorted(C.keys())
-n = len(clust_names)
+n = len(C)
 CLS_C = np.zeros((n,n))
 DCOR_C = np.zeros((n,n))
 WEAK_C = np.zeros((n,n))
 
-a = compile_cls_cohs(CLS_C)
-b = choose_coh_cls(a)
-print b
+Z = compress_cls(C, CLS)
+print Z
+print C
+print clust_names
