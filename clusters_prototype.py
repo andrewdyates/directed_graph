@@ -24,14 +24,11 @@ CLUSTS = load_clusters(open(clusts_fname))
 # Convert cluster names into row IDs (indexed from zero)
 C, clust_names = clust_names_to_row_num_list(CLUSTS, node_names)
 
-Z = compress_cls(C, CLS)
-print Z
-print C
-print clust_names
+CLS_C, CLS_Coh = compress_cls(C, CLS)
+DCOR_U, DCOR_S = compress_dcor(C, DCOR)
+WEAK_C = compress_weak(C, WEAK)
 
-D = compress_dcor(C, DCOR)
-print D
-
-
-W = compress_weak(C, WEAK)
-print W
+# save compressed matrices
+# print cluster member lists
+# plot clusters
+# plot inter-clusters
