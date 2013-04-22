@@ -2,6 +2,7 @@ from __future__ import division
 from __init__ import *
 
 # BOOL_ENUM = {0:'NA', 1:'XiY', 2:'PC', 3:'YiX', 4:'UNL', 5:'MX', 6:'NC', 7:'OR'}
+# WEAK_ENUM = 0: no class; 1: and; 2: rn4c; 3: cn4r; 4: xor; 5: mix
 CLS_HAMM_DIST = np.array((
   (0,2,2,2,2,2,2,2), # NA
   (2,0,1,2,1,2,3,2), # XiY
@@ -101,12 +102,12 @@ def choose_coh_cls(coh, min_coh=0.7):
     # Raise an exception if a class has not been chosen. Such is probably a bug.
     raise Exception, "Edge case: cannot choose most coherent class. %s" % coh
 
-def compress_cls(CLUST_i, CLS):
+def compress_cls(CLUST_i, CLS, **kwds):
   """Compress boolean class matrix by coherence using existing clustering.
 
   Args:
     CLUST_i: [set(i)] of sets of indices in `CLS` corresponding to clusters
-    CLS: np.array sym matrix of boolean class enumerations
+    CLS: np.array matrix of boolean class enumerations
   Returns:
     (COMP, COH) where:
       COMP: nxn compressed boolean class enumeration matrix, n = len(CLUST_i)
@@ -122,7 +123,7 @@ def compress_cls(CLUST_i, CLS):
     for j in xrange(i,n):
       idxs_j = list(CLUST_i[j])
       C = CLS[idxs_i,:][:,idxs_j]
-      cls, coh = get_comp_cls(C, sym=(i==j))
+      cls, coh = get_comp_cls(C, sym=(i==j), **kwds)
       COMP[i,j] = cls
       COH[i,j], COH[j,i] = coh, coh
       if i!=j: # reflect assignment over diagonal
@@ -133,3 +134,105 @@ def compress_cls(CLUST_i, CLS):
         else: 
           COMP[j,i] = cls
   return COMP, COH
+
+def get_mean_std_dcor(D, sym=True):
+  """Return mean, std of dCor matrix."""
+  if sym:
+    # upper triangle of square matrix only
+    assert len(D.shape)==2 and D.shape[0] == D.shape[1]
+    n = np.shape(D)[0]
+    if n == 1:
+      iu = 0
+    else:
+      iu = np.triu_indices(n,1)
+    u = np.mean(D[iu])
+    s = np.std(D[iu])
+  else:
+    u = np.mean(D)
+    s = np.std(D)
+  return u, s
+
+def compress_dcor(CLUST_i, DCOR):
+  """Compress dCor matrix by mean.
+
+  Args:
+    CLUST_i: [set(i)] of sets of indices in `CLS` corresponding to clusters
+    DCOR: np.array sym matrix of distance correlation
+  Returns:
+    (MEAN, STD) where:
+      MEAN: nxn compressed cluster mean DCOR matrix, n = len(CLUST_i)
+      STD: nxn corresponding standard deviation matrix
+  """
+  n = len(CLUST_i)
+  MEAN = np.zeros((n,n))
+  STD = np.zeros((n,n))
+  for i in xrange(n):
+    idxs_i = list(CLUST_i[i])
+    for j in xrange(i,n):
+      idxs_j = list(CLUST_i[j])
+      D = DCOR[idxs_i,:][:,idxs_j]
+      u, s = get_mean_std_dcor(D, sym=i==j)
+      MEAN[i,j] = u; MEAN[j,i] = u;
+      STD[i,j] = s; STD[j,i] = s;
+  return MEAN, STD
+
+
+# WEAK_ENUM = 0: no class; 1: and; 2: rn4c; 3: cn4r; 4: xor; 5: mix
+def choose_weak(WEAK, sym=True, min_pct=0.4, over_mult=2):
+  """Choose representative weak class."""
+  if sym:
+    # upper triangle of square matrix only
+    assert len(WEAK.shape)==2 and WEAK.shape[0] == WEAK.shape[1]
+    n = np.shape(WEAK)[0]
+    if n == 1:
+      iu = 0
+    else:
+      iu = np.triu_indices(n,1)
+  
+  weak_cnts = np.array([0]*6)
+  for enum in range(6):
+    if sym:
+      weak_cnts[enum] = np.sum(WEAK[iu] == enum)
+    else:
+      weak_cnts[enum] = np.sum(WEAK == enum)
+      
+  i = np.argmax(weak_cnts)
+  n = np.sum(weak_cnts)
+  # no class meets threshold, return mixed(5)
+  if i/n < min_pct:
+    return 5
+  # plurality class meets threshold and is non-directional, return it
+  if i in (0,1,4,5):
+    return i
+  # plurality is directional, check that the other direction is comparatively rare.
+  else:
+    if i == 2:
+      if weak_cnts[2] >= weak_cnts[3]*over_mult:
+        return 2
+      else:
+        return 5
+    if i == 3:
+      if weak_cnts[3] >= weak_cnts[2]*over_mult:
+        return 3
+      else:
+        return 5
+    raise Exception, "Unknown case for weak cnts. This is probably a bug. %s" % weak_cnts
+  
+def compress_weak(CLUST_i, WEAK, **kwds):
+  """Compress weak coupling matrix.
+  """
+  n = len(CLUST_i)
+  COMP = np.zeros((n,n))
+  for i in xrange(n):
+    idxs_i = list(CLUST_i[i])
+    for j in xrange(i,n):
+      idxs_j = list(CLUST_i[j])
+      W = WEAK[idxs_i,:][:,idxs_j]
+      w = choose_weak(W, sym=i==j, **kwds)
+      if w not in (2,3): # not directed
+        COMP[i,j] = w; COMP[j,i] = w
+      elif w == 2:
+        COMP[i,j] = 2; COMP[j,i] = 3
+      elif w == 3:
+        COMP[i,j] = 3; COMP[j,i] = 2
+  return COMP
