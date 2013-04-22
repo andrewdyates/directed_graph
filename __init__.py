@@ -60,7 +60,7 @@ def edge_list_to_adjM_dict(G):
   return A
 
 def edge_list_to_adjMs(G):
-  """Export graph dict returned from print_graphviz to csv."""
+  """Export graph dict returned from print_graphviz to adj matrices."""
   A = edge_list_to_adjM_dict(G)
   nodes = G['nodes']
   node_idx = dict(( (s,i) for i,s in enumerate(nodes) ))
@@ -121,7 +121,7 @@ def yield_matrix_to_edge_dict(names=None, CLS=None, DCOR=None, WEAK=None, min_d=
   if WEAK is not None:
     assert np.shape(CLS) == np.shape(WEAK)
   n = np.size(CLS,0)
-  assert n>1
+  assert n>=1
   for i in xrange(n-1):
     for j in xrange(i+1,n):
       cls, dcor = CLS[i,j], DCOR[i,j]
