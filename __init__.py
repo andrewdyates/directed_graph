@@ -22,6 +22,14 @@ def str_true_false(s):
     return False
   return True
 
+def load_clusters(fp):
+  """Load cluster node_name,enumeration from csv file pointer."""
+  C = {}
+  for line in fp:
+    name, enum = (s.strip('" ') for s in line.strip('\r\n').split(','))
+    C.setdefault(enum,set()).add(name)
+  return C
+
 def load_colors_as_node_style_dict(fp):
   """Load fp of ;-delimited node name to #xxxxxx color mappings as node style dict."""
   q = {}
