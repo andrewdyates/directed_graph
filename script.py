@@ -17,7 +17,15 @@ python script.py min_d=0.30 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname
 # with weaks, weights, dot
 python script.py min_d=0.30 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weak_fname=data/gold.weak.tab outpath_prefix=~/Desktop/gold_0.30_dot
 
-python script.py min_d=0.30 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weak_fname=data/gold.weak.tab outpath_prefix=~/Desktop/gold_0.30_dot groups_fname=data/gold.k7.hclust.csv
+# ALL TRANS
+# with weaks, weights, fdp (generates hairball)
+python script.py min_d=0.30 cls_fname=data/trans.cls.tab dcor_fname=data/trans.dcor.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=fdp weak_fname=data/trans.weak.tab outpath_prefix=~/Desktop/alltrans_0.30_fdp
+
+# with weaks, weights, dot
+python script.py min_d=0.30 cls_fname=data/trans.cls.tab dcor_fname=data/trans.dcor.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weak_fname=data/trans.weak.tab outpath_prefix=~/Desktop/alltrans_0.30_fdp
+
+# with weaks, no weights, dot
+python script.py min_d=0.30 cls_fname=data/trans.cls.tab dcor_fname=data/trans.dcor.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weak_fname=data/trans.weak.tab outpath_prefix=~/Desktop/alltrans_nw0.30_fdp weighted=False
 """
 import matrix_io as mio
 from __init__ import *
