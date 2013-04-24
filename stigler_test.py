@@ -7,10 +7,14 @@ def main():
   GOLD_D = mio.load("data/gold_standard_network.csv", dtype=str)
   MIM_D = mio.load("data/mim_msa_cov.csv", dtype=str)
   YATES_D = mio.load("data/gold_0.32_dot_nw.adj.csv", dtype=str)
+  Y2_D = mio.load("data/gold.paths.dcor0.32.k2.tab", dtype=str)
+
   assert GOLD_D["row_ids"] == GOLD_D["col_ids"]
   assert MIM_D["row_ids"] == MIM_D["col_ids"]
   assert YATES_D["row_ids"] == YATES_D["col_ids"]
   assert GOLD_D["row_ids"] == MIM_D["row_ids"]
+  assert Y2_D["row_ids"] == Y2_D["col_ids"]
+  assert Y2_D["row_ids"] == YATES_D["row_ids"]
 
   # align YATES and GOLD
   GOLDi = [ YATES_D['row_ids'].index(x) if x in YATES_D['row_ids'] else None for x in GOLD_D['row_ids'] ]
@@ -39,7 +43,10 @@ def main():
   print
   G = GOLD_D['M'][GOLDin,:][:,GOLDin]
   Y = YATES_D['M'][GOLDiy,:][:,GOLDiy]
+  Y2 = Y2_D['M'][GOLDiy,:][:,GOLDiy]
   test_mods(G,Y, row_ids)
+  print "WITH PATHS"
+  test_mods(G,Y2,row_ids)
 
 
   
@@ -118,7 +125,10 @@ def test(G,M,row_ids,col_ids=None,debug=False):
     fpr = 0
   else:
     fpr = fp/(fp+tn) # false positive rate:
-  chard = fp/(fp+fn) # incorrect computation of fpr
+  try:
+    chard = fp/(fp+fn) # incorrect computation of fpr
+  except:
+    chard = 0
   total_true = tp+tn+0.5*hr
   all_set = tp+tn+fp+fn+hr
   pc_dist = pr_space(ppv, tpr) # recall or ppv on x axis

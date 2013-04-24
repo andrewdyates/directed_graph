@@ -37,7 +37,7 @@ def get_connected(M, s, k=None, lvl=0, visited=None):
   return v
   
 def main():
-  ADJ_D = mio.load("data/gold_0.30_dot_nw.adj.csv")
+  ADJ_D = mio.load("data/gold_0.32_dot_nw.adj.csv")
   M = np.array(ADJ_D['M'],dtype=int)
   print M
   P = np.zeros(M.shape, dtype=np.int)
@@ -47,7 +47,7 @@ def main():
   print P
   print M==P
   assert ADJ_D['row_ids'] == ADJ_D['col_ids']
-  mio.save(P, open("data/gold.paths.dcor0.3.k2.tab","w"), ftype="txt", row_ids=ADJ_D['row_ids'], col_ids=ADJ_D['col_ids'])
+  mio.save(P, open("data/gold.paths.dcor0.32.k2.tab","w"), ftype="txt", row_ids=ADJ_D['row_ids'], col_ids=ADJ_D['col_ids'], fmt="%d")
 
 if __name__ == "__main__":
   main()
