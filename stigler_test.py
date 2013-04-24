@@ -35,7 +35,9 @@ def main():
   # fp.close()
 
   # COMPARE GOLD WITH MIM
-  #test_mods(GOLD_D['M'], MIM_D['M'], GOLD_D['row_ids'])
+  print "GOLD VS MIM"
+  R_G_MIM = test_mods(GOLD_D['M'], MIM_D['M'], GOLD_D['row_ids'])
+  print
 
   # COMPARE GOLD WITH YATES
   assert list(np.array(YATES_D['row_ids'])[GOLDiy]) == list(np.array(GOLD_D['row_ids'])[GOLDin])
@@ -44,10 +46,15 @@ def main():
   G = GOLD_D['M'][GOLDin,:][:,GOLDin]
   Y = YATES_D['M'][GOLDiy,:][:,GOLDiy]
   Y2 = Y2_D['M'][GOLDiy,:][:,GOLDiy]
-  test_mods(G,Y, row_ids)
-  print "WITH PATHS"
-  test_mods(G,Y2,row_ids)
+  print "GOLD VS YATES EDGES"
+  R_G_Y = test_mods(G,Y, row_ids)
+  print
+  
+  print "GOLD VS YATES WITH PATHS"
+  R_G_Y2 = test_mods(G,Y2,row_ids)
+  print
 
+  ### GENERATE TABLE
 
   
 def test_mods(G,M,row_ids):
@@ -88,6 +95,8 @@ def test_mods(G,M,row_ids):
   print "mesoderm (s)"
   print r_meso_s
   print
+  return {'overall': r_overall, 'pal1': r_pal1, 'ecto': r_ecto,
+          'ecto_s': r_ecto_s, 'meso': r_meso, 'meso_s': r_meso_s}
 
 def test(G,M,row_ids,col_ids=None,debug=False):
   if col_ids is None:
