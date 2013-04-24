@@ -278,3 +278,25 @@ def edgecolor(c,d):
   else:           # All other edges
     return "#222222"   # almost black
 
+def to_path_matrix(M, k=None):
+  P = np.zeros(M.shape, dtype=np.int)
+  for i in xrange(M.shape[1]):
+    js = list(get_connected(M, i, k=k))
+    P[js,i] = 1
+  return P
+
+def get_connected(M, s, k=None, lvl=0, visited=None):
+  """Return set of all connected indices to s from column->row adj matrix."""
+  if visited is None:
+    visited=set()
+  if k is not None and lvl >= k:
+    return set()
+  q = np.nonzero(M[:,s])[0]
+  c = [i for i in q if i not in visited]
+  v = visited.copy()
+  v.update(c)
+  for i in c:
+    t = get_connected(M,i,k,lvl+1,v)
+    v.update(t)
+  return v
+  

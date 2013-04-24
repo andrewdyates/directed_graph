@@ -27,7 +27,6 @@ python script.py min_d=0.8 cls_fname=data/trans.cls.tab dcor_fname=data/trans.dc
 # ----------------------------------------
 python script.py min_d=0.32 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weak_fname=data/gold.weak.tab weighted=False outpath_prefix=~/Desktop/gold_0.32_dot_nw
 
-
 python script.py min_d=0.36 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weak_fname=data/gold.weak.tab weighted=False outpath_prefix=~/Desktop/gold_0.36_dot_nw
 """
 import matrix_io as mio
