@@ -87,6 +87,16 @@ def adjM_to_out(out, Adj, nodes):
     r = [str(int(r)) for r in row]
     print >>out, ",".join([nodes[i]]+r)
   
+def get_adj_dict(names, CLS, DCOR, WEAK=None):
+  G = {'nodes':names, 'edges':[]}
+  if len(names) > 1:
+    for d in yield_matrix_to_edge_dict(names=names, CLS=CLS, DCOR=DCOR, WEAK=WEAK):
+      if d:
+        print >>out, edge_attr_to_line(d)
+        G['edges'].append(d)
+  return G
+
+    
 def print_graphviz(names, out=sys.stdout, node_styles=None, graph_type="digraph", prefix="", postfix="", cluster_sizes=None, **kwds):
   """Print graphviz output to `out` stream.
   Return dict of edge and node representation

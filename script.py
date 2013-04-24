@@ -21,11 +21,14 @@ python script.py min_d=0.30 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname
 # with weaks, weights, fdp (generates hairball)
 python script.py min_d=0.30 cls_fname=data/trans.cls.tab dcor_fname=data/trans.dcor.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=fdp weak_fname=data/trans.weak.tab outpath_prefix=~/Desktop/alltrans_0.30_fdp
 
-# with weaks, weights, dot
-python script.py min_d=0.30 cls_fname=data/trans.cls.tab dcor_fname=data/trans.dcor.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weak_fname=data/trans.weak.tab outpath_prefix=~/Desktop/alltrans_0.30_fdp
+# with weaks, weights, fdp
+python script.py min_d=0.8 cls_fname=data/trans.cls.tab dcor_fname=data/trans.dcor.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=fdp weak_fname=data/trans.weak.tab outpath_prefix=~/Desktop/alltrans_0.8_fdp
 
-# with weaks, no weights, dot
-python script.py min_d=0.30 cls_fname=data/trans.cls.tab dcor_fname=data/trans.dcor.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weak_fname=data/trans.weak.tab outpath_prefix=~/Desktop/alltrans_nw0.30_fdp weighted=False
+# ----------------------------------------
+python script.py min_d=0.32 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weak_fname=data/gold.weak.tab weighted=False outpath_prefix=~/Desktop/gold_0.32_dot_nw
+
+
+python script.py min_d=0.36 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weak_fname=data/gold.weak.tab weighted=False outpath_prefix=~/Desktop/gold_0.36_dot_nw
 """
 import matrix_io as mio
 from __init__ import *
