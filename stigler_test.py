@@ -29,7 +29,17 @@ def main():
   #   fp.write(GOLD_D['row_ids'][i]+",")
   #   fp.write(",".join(row)+"\n")
   # fp.close()
-  test_mods(GOLD_D['M'], MIM_D['M'], GOLD_D['row_ids'])
+
+  # COMPARE GOLD WITH MIM
+  #test_mods(GOLD_D['M'], MIM_D['M'], GOLD_D['row_ids'])
+
+  # COMPARE GOLD WITH YATES
+  assert list(np.array(YATES_D['row_ids'])[GOLDiy]) == list(np.array(GOLD_D['row_ids'])[GOLDin])
+  row_ids=list(np.array(GOLD_D['row_ids'])[GOLDin])
+  print
+  G = GOLD_D['M'][GOLDin,:][:,GOLDin]
+  Y = YATES_D['M'][GOLDiy,:][:,GOLDiy]
+  test_mods(G,Y, row_ids)
 
 
   
