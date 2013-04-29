@@ -28,6 +28,33 @@ python script.py min_d=0.8 cls_fname=data/trans.cls.tab dcor_fname=data/trans.dc
 python script.py min_d=0.32 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weak_fname=data/gold.weak.tab weighted=False outpath_prefix=~/Desktop/gold_0.32_dot_nw
 
 python script.py min_d=0.36 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weak_fname=data/gold.weak.tab weighted=False outpath_prefix=~/Desktop/gold_0.36_dot_nw
+
+# -----------------------------------------
+# attempt to plot C9 k=18 all trans clusters
+python script.py min_d=0.32 cls_fname=data/all.trans.k18.C9.CLS.apr28.tab dcor_fname=data/all.trans.k18.C9.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=fdp weighted=True outpath_prefix=~/Desktop/all_C9_0.32_fdp
+
+python script.py min_d=0.32 cls_fname=data/all.trans.k18.C9.CLS.apr28.tab dcor_fname=data/all.trans.k18.C9.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False outpath_prefix=~/Desktop/all_C9_0.32_dot_nw
+
+python script.py min_d=0.4 cls_fname=data/all.trans.k18.C9.CLS.apr28.tab dcor_fname=data/all.trans.k18.C9.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False outpath_prefix=~/Desktop/all_C9_0.4_dot_nw
+
+# ----------------------------------------
+# ATTEMPT TO PLOT k61 one iteration compressed clusters
+# ----------------------------------------
+python script.py min_d=0.32 cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False outpath_prefix=~/Desktop/all_k61_0.32_dot_nw
+
+python script.py min_d=0.4 cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False outpath_prefix=~/Desktop/all_k61_0.4_dot_nw
+
+python script.py min_d=0.5 cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False outpath_prefix=~/Desktop/all_k61_0.5_dot_nw
+
+# include weak directions
+python script.py min_d=0.5 weak_fname=data/all.trans.k61.WEAK.apr28.tab cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False outpath_prefix=~/Desktop/all_k61_0.5_dot_nw_weaks
+
+# force layout
+python script.py min_d=0.5 weak_fname=data/all.trans.k61.WEAK.apr28.tab cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=fdp weighted=True outpath_prefix=~/Desktop/all_k61_0.5_fdp_weaks
+
+python script.py min_d=0.6 weak_fname=data/all.trans.k61.WEAK.apr28.tab cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=fdp weighted=True outpath_prefix=~/Desktop/all_k61_0.6_fdp_weaks
+
+python script.py min_d=0.6 weak_fname=data/all.trans.k61.WEAK.apr28.tab cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False outpath_prefix=~/Desktop/all_k61_0.6_dot_nw_weaks
 """
 import matrix_io as mio
 from __init__ import *

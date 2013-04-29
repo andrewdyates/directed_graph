@@ -6,7 +6,7 @@ import numpy as np
 import sys
 
 # boolean class enumation key
-BOOL_ENUM = {0:'NA', 1:'XiY', 2:'PC', 3:'YiX', 4:'UNL', 5:'MX', 6:'NC', 7:'OR'}
+BOOL_ENUM = {0:'NA', 1:'XiY', 2:'PC', 3:'YiX', 4:'UNL', 5:'MX', 6:'NC', 7:'OR', 8:'NA'}
 # 0: no class; 1: and; 2: rn4c (row necessary for col); 3: cn4r (col necessary for row); 4: xor; 5: mix
 WEAK_ENUM = {0:'nc', 1:'and', 2:'rn4c', 3:'cn4r', 4:'xor', 5:'mix'}
 
@@ -106,6 +106,8 @@ def print_graphviz(names, out=sys.stdout, node_styles=None, graph_type="digraph"
   print >>out, "%s {" % (graph_type)
   if prefix: print >>out, prefix
   print >>out, FONT_STRING
+  # strip double quotes in node names
+  names = [s.strip('"') for s in names]
   # Flag for plotting as clusters or not.
   as_clusters = cluster_sizes is not None
   # Print node list, add style if it exists.
@@ -186,7 +188,9 @@ def get_edge_dict(rowname, colname, cls, dcor, weak_cls=None, min_dcor=0, plot_n
     
   # Edge Direction
   # ------------------------------
-  d = {'cls':int(cls), 'dcor':dcor, 'weak':int(weak_cls), 'is_weak':False, 'cluster_edge':as_clusters}
+  d = {'cls':int(cls), 'dcor':dcor, 'cluster_edge':as_clusters}
+  if not weak_cls is None:
+    d.update({'weak':int(weak_cls), 'is_weak':False})
   if cls == 1:
     d['source'] = rowname; d['dest'] = colname
     d['directed'] = True
@@ -219,7 +223,7 @@ def get_edge_dict(rowname, colname, cls, dcor, weak_cls=None, min_dcor=0, plot_n
   d['attr'] = {"penwidth":penwidth(cls,dcor,scale=as_clusters), "color":'"%s"'%edgecolor(cls,dcor)}
   if weight is not None:
     d['attr']["weight"] = weight
-  if cls == 0:
+  if cls == 0 or cls == 8:
     d['attr'].update({'dir':"none", "constraint":"false", "style":"dotted"})
   elif cls == 2:
     d['attr'].update({'dir':"none", "constraint":"false"})

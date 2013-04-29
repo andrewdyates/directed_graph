@@ -143,8 +143,17 @@ def test(G,M,row_ids,col_ids=None,debug=False):
   pc_dist = pr_space(ppv, tpr) # recall or ppv on x axis
   roc_dist = roc_space(fpr, tpr) # fpr on x axis, tpr on y axis
   chigger_dist = roc_space(chard, tpr) # fpr on x axis, tpr on y axis
+
+  #accuracy.... sensitvity, specifcity
+  acc = (tp+tn+(0.5*hr))/(tp+fp+fn+tn+hr)
+  prec = (tp+(0.5)*hr)/(tp+fp+(0.5*hr))
+  sens = (tp+(0.5)*hr) / (tp+(0.5)*hr+fn)
+  try:
+    spec = tn / (tn+fp)
+  except:
+    spec = 0
   
-  return {'tp':tp,'tn':tn,'fp':fp,'fn':fn,'hr':hr,'tpr':tpr,'ppv':ppv,'total':total,'true':total_true,"R":R, 'all':all_set,'fpr':fpr, 'pc_dist': pc_dist, 'roc_dist':roc_dist, 'chard':chard, 'chigger': chigger_dist}
+  return {'tp':tp,'tn':tn,'fp':fp,'fn':fn,'hr':hr,'tpr':tpr,'ppv':ppv,'total':total,'true':total_true,"R":R, 'all':all_set,'fpr':fpr, 'pc_dist': pc_dist, 'roc_dist':roc_dist, 'chard':chard, 'chigger': chigger_dist, 'acc':acc, 'prec':prec, 'sens':sens, 'spec':spec}
 
 
 # x: fpr, y: tpr
