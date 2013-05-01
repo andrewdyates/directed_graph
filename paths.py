@@ -1,7 +1,11 @@
-#!/usr/bin/python
-import matrix_io as mio
 import numpy as np
 
+def fill_paths(M, k=None):
+  P = np.zeros(M.shape, dtype=np.int)
+  for i in xrange(M.shape[1]):
+    js = list(get_connected(M, i, k=k))
+    P[js,i] = 1
+  return P
 
 def is_path(M, s, k=None):
   """Return all nodes connected to node q by a directed path by d.
@@ -34,19 +38,3 @@ def get_connected(M, s, k=None, lvl=0, visited=None):
     t = get_connected(M,i,k,lvl+1,v)
     v.update(t)
   return v
-  
-def main():
-  ADJ_D = mio.load("data/gold_0.32_dot_nw.adj.csv")
-  M = np.array(ADJ_D['M'],dtype=int)
-  print M
-  P = np.zeros(M.shape, dtype=np.int)
-  for i in xrange(M.shape[1]):
-    js = list(get_connected(M, i, k=2))
-    P[js,i] = 1
-  print P
-  print M==P
-  assert ADJ_D['row_ids'] == ADJ_D['col_ids']
-  mio.save(P, open("data/gold.paths.dcor0.32.k2.tab","w"), ftype="txt", row_ids=ADJ_D['row_ids'], col_ids=ADJ_D['col_ids'], fmt="%d")
-
-if __name__ == "__main__":
-  main()

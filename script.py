@@ -126,7 +126,7 @@ def make_and_compile(outpath_prefix=None, output_type="pdf", graphviz_cmd="dot",
 
 
 if __name__ == "__main__":
-  kwds = dict([s.split('=') for s in sys.argv[1:]])
+  kwds = dict([(s.partition('=')[0],s.partition('=')[2]) for s in sys.argv[1:]])
   print kwds
   make_and_compile(**kwds)
   
