@@ -8,7 +8,7 @@ def fill_paths(M, k=None):
   return P
 
 def is_path(M, s, k=None):
-  """Return all nodes connected to node q by a directed path by d.
+  """Return all nodes connected to node s by a directed path by d.
 
   M: column to row adj matrix
   """

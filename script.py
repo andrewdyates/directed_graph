@@ -55,6 +55,32 @@ python script.py min_d=0.5 weak_fname=data/all.trans.k61.WEAK.apr28.tab cls_fnam
 python script.py min_d=0.6 weak_fname=data/all.trans.k61.WEAK.apr28.tab cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=fdp weighted=True outpath_prefix=~/Desktop/all_k61_0.6_fdp_weaks
 
 python script.py min_d=0.6 weak_fname=data/all.trans.k61.WEAK.apr28.tab cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False outpath_prefix=~/Desktop/all_k61_0.6_dot_nw_weaks
+
+# ----------------------------------------
+# PLOT with invisible edges, clusters, no weaks
+# ----------------------------------------
+python script.py min_d=0.5 weak_fname=data/all.trans.k61.WEAK.apr28.tab cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False outpath_prefix=~/Desktop/all_k61_0.5_dot_nw_weaks ignore_fname=data/all_k61_0.5_dot_nw.adj.ignore.csv
+
+python script.py min_d=0.5 cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False outpath_prefix=~/Desktop/all_k61_0.5_dot_nw
+
+python script.py min_d=0.5 cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False outpath_prefix=~/Desktop/all_k61_0.5_dot_nw_ignores ignore_fname=data/all_k61_0.5_dot_nw.adj.ignore.csv
+
+python script.py min_d=0.5 cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False outpath_prefix=~/Desktop/all_k61_0.5_dot_nw_ignores_weaks ignore_fname=data/all_k61_0.5_dot_nw.adj.ignore.csv weak_fname=data/all.trans.k61.WEAK.apr28.tab
+
+## ignores, no weaks
+python script.py min_d=0.5 cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False outpath_prefix=~/Desktop/all_k61_0.5_dot_nw_ignores ignore_fname=data/all_k61_0.5_dot_nw.adj.ignore.csv
+
+## add groups and remove disconnected
+python script.py min_d=0.5 cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False outpath_prefix=~/Desktop/all_k61_0.5_dot_nw_ignores ignore_fname=data/all_k61_0.5_dot_nw.adj.ignore.csv rank_cluster_fname=data/same_rank_clusters.txt
+
+## more aggressive ignore
+python script.py min_d=0.5 cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False ignore_fname=data/all_k61_0.5_dot_nw.adj.ignore.dcor6.csv rank_cluster_fname=data/same_rank_clusters.txt outpath_prefix=~/Desktop/all_k61_0.5_dot_nw_ignores.6
+
+
+## USED IN PUBLICATION
+python script.py min_d=0.5 cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False ignore_fname=data/all_k61_0.5_dot_nw.adj.ignore.dcor65.csv rank_cluster_fname=data/same_rank_clusters.txt outpath_prefix=~/Desktop/all_k61_0.5_dot_nw_ignores.65 ignore_nodes=53
+
+python script.py min_d=0.5 cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False  rank_cluster_fname=data/same_rank_clusters.txt ignore_nodes=53 outpath_prefix=~/Desktop/all_k61_0.5_dot_nw ignore_nodes=53
 """
 import matrix_io as mio
 from __init__ import *
@@ -62,13 +88,15 @@ import sys
 import subprocess
 
 
-def matrix_files_to_flat_graphviz_file(cls_fname=None, dcor_fname=None, out_fname=None, color_fname=None, weak_fname=None, min_d=0, weighted=True, plot_na=False, **kwds):
+def matrix_files_to_flat_graphviz_file(cls_fname=None, dcor_fname=None, out_fname=None, ignore_fname=None, color_fname=None, weak_fname=None, min_d=0, weighted=True, plot_na=False, rank_cluster_fname=None, ignore_nodes=None, **kwds):
   """From matrix file names and parameters, write resulting graphviz output to file."""
   assert cls_fname and dcor_fname and out_fname
   weighted = str_true_false(weighted)
   plot_na = str_true_false(plot_na)
   min_d = float(min_d)
   assert min_d >= 0
+  if ignore_nodes is not None:
+    ignore_nodes = ignore_nodes.split(',')
   
   CLS_D = mio.load(cls_fname)
   DCOR_D = mio.load(dcor_fname)
@@ -76,6 +104,13 @@ def matrix_files_to_flat_graphviz_file(cls_fname=None, dcor_fname=None, out_fnam
     node_styles = load_colors_as_node_style_dict(open(color_fname))
   else:
     node_styles = None
+    
+  if rank_cluster_fname is not None:
+    rank_clusters = load_rank_clusters(open(rank_cluster_fname))
+  else:
+    rank_clusters = None
+  print rank_clusters
+  
   assert CLS_D['row_ids'] == CLS_D['col_ids']
   assert DCOR_D['row_ids'] == DCOR_D['col_ids']
   assert CLS_D['row_ids'] == DCOR_D['row_ids']
@@ -93,8 +128,22 @@ def matrix_files_to_flat_graphviz_file(cls_fname=None, dcor_fname=None, out_fnam
   else:
     WEAK = None
   
+  if ignore_fname:
+    IGNORE_D = mio.load(ignore_fname, force_row_ids=True, force_col_ids=True)
+    assert IGNORE_D['row_ids'] == IGNORE_D['col_ids']
+    try:
+      assert IGNORE_D['row_ids'] == names
+    except AssertionError:
+      print IGNORE_D['row_ids']
+      print names
+      raise
+    IGNORE = IGNORE_D["M"]
+    assert np.shape(IGNORE) == np.shape(CLS)
+  else:
+    IGNORE = None
+  
   out = open(out_fname, "w")
-  G = print_graphviz(names=names, out=out, CLS=CLS, DCOR=DCOR, WEAK=WEAK, node_styles=node_styles, min_d=min_d, weighted=weighted, plot_na=plot_na, **kwds)
+  G = print_graphviz(names=names, out=out, CLS=CLS, DCOR=DCOR, WEAK=WEAK, IGNORE=IGNORE, node_styles=node_styles, min_d=min_d, weighted=weighted, plot_na=plot_na, rank_clusters=rank_clusters, ignore_nodes=ignore_nodes, **kwds)
   out.close()
   return G
 

@@ -11,9 +11,19 @@ BOOL_ENUM = {0:'NA', 1:'XiY', 2:'PC', 3:'YiX', 4:'UNL', 5:'MX', 6:'NC', 7:'OR', 
 WEAK_ENUM = {0:'nc', 1:'and', 2:'rn4c', 3:'cn4r', 4:'xor', 5:'mix'}
 
 # GRAPHVIZ TEMPLATES
-FONT_STRING = """graph [fontname = "helvetica"];
-node [fontname = "helvetica"];
+FONT_STRING = """graph [fontname = "helvetica", nodesep=0, splines=ortho, ranksep=0.7, rank=same];
+node [fontname = "helvetica", color="#000000", style=filled, fillcolor="#ffffff"];
 edge [fontname = "helvetica", penwidth=1];"""
+
+def load_rank_clusters(fp):
+  C = []
+  for line in fp:
+    line = line.strip()
+    if not line: continue
+    c = eval(line)
+    for q in c:
+      C.append(q)
+  return C
 
 def str_true_false(s):
   if not s:
@@ -37,7 +47,7 @@ def load_colors_as_node_style_dict(fp):
     s = s.strip("\n\r")
     if not (len(s)>0 and s[0]!="#"): continue
     node, color = s.split(';')
-    q[node] = {'color':color}
+    q[node] = {'fillcolor':color, 'color':color}
   return dict(q)
 
 def node_style_dict_to_str(d, is_filled=True):
@@ -92,12 +102,11 @@ def get_adj_dict(names, CLS, DCOR, WEAK=None):
   if len(names) > 1:
     for d in yield_matrix_to_edge_dict(names=names, CLS=CLS, DCOR=DCOR, WEAK=WEAK):
       if d:
-        print >>out, edge_attr_to_line(d)
         G['edges'].append(d)
   return G
 
     
-def print_graphviz(names, out=sys.stdout, node_styles=None, graph_type="digraph", prefix="", postfix="", cluster_sizes=None, **kwds):
+def print_graphviz(names, out=sys.stdout, node_styles=None, graph_type="digraph", prefix="", postfix="", cluster_sizes=None, rank_clusters=None, ignore_nodes=None, weak_orders=True, **kwds):
   """Print graphviz output to `out` stream.
   Return dict of edge and node representation
   See `yield_matrix_to_edge_dict` for additional options passed via **kwds.
@@ -107,11 +116,17 @@ def print_graphviz(names, out=sys.stdout, node_styles=None, graph_type="digraph"
   if prefix: print >>out, prefix
   print >>out, FONT_STRING
   # strip double quotes in node names
+  if ignore_nodes is not None:
+    ignore_nodes = set(ignore_nodes)
+  else:
+    ignore_nodes = set()
   names = [s.strip('"') for s in names]
   # Flag for plotting as clusters or not.
   as_clusters = cluster_sizes is not None
   # Print node list, add style if it exists.
   for i, node_name in enumerate(names):
+    if node_name in ignore_nodes:
+      continue
     if as_clusters:
       # default pdf dpi is 72px/in
       w,h=cluster_sizes[i]
@@ -124,6 +139,11 @@ def print_graphviz(names, out=sys.stdout, node_styles=None, graph_type="digraph"
       print >>out, '"%s" [%s];' % (node_name, node_style_dict_to_str(style_d, not as_clusters))
     else:
       print >>out, '"%s";' % (node_name)
+  # Print node groupings
+  if rank_clusters is not None:
+    for i,c in enumerate(rank_clusters):
+      print >>out, subgraph_string(c,i,ignore_nodes)
+    
   # Print edges
   G = {'nodes':names, 'edges':[]}
   if len(names) > 1:
@@ -136,7 +156,22 @@ def print_graphviz(names, out=sys.stdout, node_styles=None, graph_type="digraph"
   print >>out, "}"
   return G
 
-def yield_matrix_to_edge_dict(names=None, CLS=None, DCOR=None, WEAK=None, min_d=0.3, weighted=True, plot_na=False, as_clusters=False, **kwds):
+def subgraph_string(c,i,ignore_nodes=None):
+  if ignore_nodes is None:
+    ignore_nodes = []
+  s = []
+  s += ["subgraph cluster_%d {"%i]
+  if len(c) > 1:
+    s += ['style=filled;\n color="#dddddd";']
+  else:
+    s += ['style=invis']
+  for name in c:
+    if name not in ignore_nodes:
+      s += ['"%s";'%str(name)]
+  s += ["}"]
+  return "\n".join(s)
+  
+def yield_matrix_to_edge_dict(names=None, CLS=None, DCOR=None, WEAK=None, IGNORE=None, min_d=0.3, weighted=True, plot_na=False, as_clusters=False, weak_orders=True, **kwds):
   """Yield graphviz edge dict from adj matrices and list of names. Return None if no edge."""
   assert names is not None and CLS is not None and DCOR is not None
   assert np.size(CLS,0) == np.size(CLS,1)
@@ -153,13 +188,19 @@ def yield_matrix_to_edge_dict(names=None, CLS=None, DCOR=None, WEAK=None, min_d=
         weak = WEAK[i,j]
       else:
         weak = None
+      if IGNORE is not None:
+        ignore = IGNORE[i,j]
+      else:
+        ignore = None
       if weighted:
         weight = dcor
       else:
         weight = None
       d = get_edge_dict(\
-            rowname=names[i], colname=names[j], cls=cls, dcor=dcor,\
-            weak_cls=weak, min_dcor=min_d, plot_na=plot_na, weight=weight, as_clusters=as_clusters)
+            rowname=names[i], colname=names[j], cls=cls, dcor=dcor, ignore=ignore,\
+            weak_cls=weak, min_dcor=min_d, plot_na=plot_na, weight=weight, as_clusters=as_clusters,\
+            weak_orders=weak_orders\
+      )
       yield d
 
 def edge_attr_to_line(d):
@@ -168,18 +209,20 @@ def edge_attr_to_line(d):
   a = ", ".join(("%s=%s"%(k,v) for k,v in d['attr'].items()))
   return "%s[%s];" % (e,a)
     
-def get_edge_dict(rowname, colname, cls, dcor, weak_cls=None, min_dcor=0, plot_na=False, weight=None, as_clusters=False):
+def get_edge_dict(rowname, colname, cls, dcor, weak_cls=None, ignore=None, min_dcor=0, plot_na=False, weight=None, as_clusters=False, weak_orders=False):
   """Return an attribute dict describing an edge. Return None if no edge."""
   assert cls in BOOL_ENUM.keys(); assert dcor >= 0 and dcor <= 1;
   assert min_dcor >= 0 and min_dcor <= 1
   assert rowname and colname
+  if ignore is not None:
+    assert ignore in (0,1,True,False)
   if weight is not None:
     if not isinstance(weight, basestring):
       weight = "%f"%weight
   
   # Edge Filtering
   # ------------------------------
-  if not plot_na and cls == 0:
+  if not plot_na and (cls == 0 or cls == 8):
     return None
   if cls not in (0,1,2,3,4) and not as_clusters:
     return None
@@ -224,14 +267,17 @@ def get_edge_dict(rowname, colname, cls, dcor, weak_cls=None, min_dcor=0, plot_n
   if weight is not None:
     d['attr']["weight"] = weight
   if cls == 0 or cls == 8:
-    d['attr'].update({'dir':"none", "constraint":"false", "style":"dotted"})
+    d['attr'].update({'dir':"none", "constraint":"false", "style":"dashed"})
   elif cls == 2:
     d['attr'].update({'dir':"none", "constraint":"false"})
   elif cls == 4:
     if weak_cls is not None:
       # necessary direction edges
       if weak_cls == 2 or weak_cls == 3:
-        d['attr'].update({"style":"dashed"})
+        if weak_orders:
+          d['attr'].update({"style":"dashed", "constraint":"true"})
+        else:
+          d['attr'].update({"style":"dashed", "constraint":"false"})
       else:
         d['attr'].update({'dir':"none", "constraint":"false", "style":"dashed"})
     else:
@@ -242,6 +288,10 @@ def get_edge_dict(rowname, colname, cls, dcor, weak_cls=None, min_dcor=0, plot_n
     pass
   else:
     raise Exception, "Unrecognized class %s" % cls
+
+  # Make ignored edges invisible
+  if ignore is not None and ignore:
+    d['attr']['style'] = "invis"
       
   # RETURN EDGE DICT
   return d
@@ -272,7 +322,7 @@ def edgecolor(c,d):
     elif d > 0.8: return "#4197c7" # medium blue
     else:         return "#64acd4" # light blue
   elif c == 4:
-    return "#888888"
+    return "#999999"
   elif c == 5:
     return "#a00d42"
   elif c == 6:

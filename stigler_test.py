@@ -63,7 +63,7 @@ def test_mods(G,M,row_ids):
   pal1_i = [row_ids.index(x) for x in ["pal-1"]]
   ecto_i = [row_ids.index(x) for x in ["elt-1", "lin-26", "nhr-25", "elt-3"]]
   meso_i = [row_ids.index(x) for x in ["hnd-1", "hlh-1", "unc-120"]]
-  r_overall = test(G,M,row_ids)
+  r_overall = test(G,M,row_ids) # gold, model
   r_pal1 = test(G[:,pal1_i], M[:,pal1_i], row_ids, col_ids=["pal-1"])
   r_ecto = test(G[ecto_i,:], M[ecto_i,:], ["elt-1", "lin-26", "nhr-25", "elt-3"], row_ids)
   r_meso = test(G[meso_i,:], M[meso_i,:], ["hnd-1", "hlh-1", "unc-120"], row_ids)
@@ -98,6 +98,7 @@ def test_mods(G,M,row_ids):
   return {'overall': r_overall, 'pal1': r_pal1, 'ecto': r_ecto,
           'ecto_s': r_ecto_s, 'meso': r_meso, 'meso_s': r_meso_s}
 
+#Gold, model
 def test(G,M,row_ids,col_ids=None,debug=False):
   if col_ids is None:
     col_ids = row_ids
@@ -107,8 +108,12 @@ def test(G,M,row_ids,col_ids=None,debug=False):
   tp, tn, fp, fn, hr = 0,0,0,0,0
   for i in xrange(nrow):
     for j in xrange(ncol):
-      if row_ids[i] == col_ids[j]: continue
-      m,g = M[i,j], G[i,j]
+      # if row_ids[i] == col_ids[j]:
+      #   #continue
+      #   g, m = G[i,j], "1"
+      # else:
+      #   g, m = G[i,j], M[i,j]
+      g, m = G[i,j], M[i,j]
       if (m=="1" and g=="1") or (m=="1" and g=="-1") or (m=="-1" and g=="-1"):
         tp += 1
         R[i][j] = "TP"
