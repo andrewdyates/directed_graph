@@ -2,6 +2,8 @@
 Hack script to prune directed cluster graph.
 
 dot -Tpdf ~/Dropbox/biostat/git_repos/directed_graph/data/all_k61_0.5_dot_nw_hack.dot -o /Users/z/Desktop/all_k61_0.5_dot_nw.dot.pdf
+
+python summarize_summary_graphviz.py
 """
 from __future__ import division
 import paths
@@ -131,12 +133,14 @@ def main():
   print "Total:", NT
   print "Same Level:", NS
   print "Redundant Far:", NF
-  n_rm = NS['total']+NF['total']+NL['total']
-  print "removed:", n_rm
-  print "reduction:", n_rm/NT['total']
+  n_rm = NS['total']+NF['total']+NL['total'] # this is wrong
+  #$print "removed:", n_rm
+  #print "reduction:", n_rm/NT['total']
   
   # 7: Save Edge Ignore Matrix
   Ignore = Ignore_Clust | Ignore_Far | Ignore_Low
+  NI = count_edges(Ignore)
+  print "Ignored", NI
   print np.sum(Ignore)
   print np.sum(Ignore_Clust | Ignore_Far)
     
