@@ -6,8 +6,11 @@ import numpy as np
 def main():
   GOLD_D = mio.load("data/gold_standard_network.csv", dtype=str)
   MIM_D = mio.load("data/mim_msa_cov.csv", dtype=str)
-  YATES_D = mio.load("data/gold_0.32_dot_nw.adj.csv", dtype=str)
-  Y2_D = mio.load("data/gold.paths.dcor0.32.k2.tab", dtype=str)
+  # HACK for biovis: load no weaks
+  YATES_D = mio.load("data/biovis_gold/gold_0.32_dot_noweak_noclust.adj.csv", dtype=str)
+  Y2_D = mio.load("data/biovis_gold/gold_0.32_dot_noweak_noclust.adj.csv", dtype=str)
+  #YATES_D = mio.load("data/gold_0.32_dot_nw.adj.csv", dtype=str)
+  #Y2_D = mio.load("data/gold.paths.dcor0.32.k2.tab", dtype=str)
 
   assert GOLD_D["row_ids"] == GOLD_D["col_ids"]
   assert MIM_D["row_ids"] == MIM_D["col_ids"]
@@ -108,6 +111,8 @@ def test(G,M,row_ids,col_ids=None,debug=False):
   tp, tn, fp, fn, hr = 0,0,0,0,0
   for i in xrange(nrow):
     for j in xrange(ncol):
+      if row_ids[i] == col_ids[j]:
+        continue
       # if row_ids[i] == col_ids[j]:
       #   #continue
       #   g, m = G[i,j], "1"

@@ -91,6 +91,9 @@ python script.py min_d=0.32 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname
 
 python script.py min_d=0.32 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot rank_cluster_fname=data/biovis_gold/same_rank_clusters_gold.txt ignore_fname=data/biovis_gold/gold_0.32_dot_noweak_ignore_0.75.csv outpath_prefix=~/Desktop/gold_0.32_dot_noweak_noclust_0.75ignores_new_ranks rank_clust_names=True do_rank_clust=False
 
+### all transcription factors, no clustering, no weaks
+### ----
+python script.py min_d=0.6 cls_fname=data/trans.cls.tab dcor_fname=data/trans.dcor.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False outpath_prefix=~/Desktop/all_trans_0.6_dot_nw output_type=plain
 
 # with weaks, no weights, dot
 python script.py min_d=0.30 cls_fname=data/trans.cls.tab dcor_fname=data/trans.dcor.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weak_fname=data/trans.weak.tab outpath_prefix=~/alltrans_nw0.30_fdp weighted=False
