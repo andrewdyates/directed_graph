@@ -77,10 +77,21 @@ python script.py min_d=0.5 cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname
 python script.py min_d=0.5 cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False ignore_fname=data/all_k61_0.5_dot_nw.adj.ignore.dcor6.csv rank_cluster_fname=data/same_rank_clusters.txt outpath_prefix=~/Desktop/all_k61_0.5_dot_nw_ignores.6
 
 
-## USED IN PUBLICATION
+## ORIGINAL BIOVIS MANUSCRIPT
 python script.py min_d=0.5 cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False ignore_fname=data/all_k61_0.5_dot_nw.adj.ignore.dcor65.csv rank_cluster_fname=data/same_rank_clusters.txt outpath_prefix=~/Desktop/all_k61_0.5_dot_nw_ignores.65 ignore_nodes=53
 
 python script.py min_d=0.5 cls_fname=data/all.trans.k61.CLS.apr28.tab dcor_fname=data/all.trans.k61.DCOR.apr28.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weighted=False  rank_cluster_fname=data/same_rank_clusters.txt ignore_nodes=53 outpath_prefix=~/Desktop/all_k61_0.5_dot_nw ignore_nodes=53
+
+#### BIOVIS revised run
+python script.py min_d=0.32 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab outpath_prefix=~/Desktop/gold_0.32_dot_noweak_noclust color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot
+
+python script.py min_d=0.32 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot rank_cluster_fname=data/biovis_gold/same_rank_clusters_gold.txt ignore_fname=data/biovis_gold/gold_0.32_dot_noweak_ignore_0.65.csv outpath_prefix=~/Desktop/gold_0.32_dot_noweak_noclust_0.65ignores_preserve_ranks rank_clust_names=True
+
+python script.py min_d=0.32 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot rank_cluster_fname=data/biovis_gold/same_rank_clusters_gold.txt ignore_fname=data/biovis_gold/gold_0.32_dot_noweak_ignore_0.65.csv outpath_prefix=~/Desktop/gold_0.32_dot_noweak_noclust_0.65ignores_new_ranks rank_clust_names=True do_rank_clust=False
+
+python script.py min_d=0.32 cls_fname=data/D.expr.gold.CLS.apr.19.tab dcor_fname=data/D.expr.gold.DCOR.apr.19.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot rank_cluster_fname=data/biovis_gold/same_rank_clusters_gold.txt ignore_fname=data/biovis_gold/gold_0.32_dot_noweak_ignore_0.75.csv outpath_prefix=~/Desktop/gold_0.32_dot_noweak_noclust_0.75ignores_new_ranks rank_clust_names=True do_rank_clust=False
+
+
 """
 import matrix_io as mio
 from __init__ import *
@@ -88,7 +99,7 @@ import sys
 import subprocess
 
 
-def matrix_files_to_flat_graphviz_file(cls_fname=None, dcor_fname=None, out_fname=None, ignore_fname=None, color_fname=None, weak_fname=None, min_d=0, weighted=True, plot_na=False, rank_cluster_fname=None, ignore_nodes=None, **kwds):
+def matrix_files_to_flat_graphviz_file(cls_fname=None, dcor_fname=None, out_fname=None, ignore_fname=None, color_fname=None, weak_fname=None, min_d=0, weighted=True, plot_na=False, rank_cluster_fname=None, ignore_nodes=None, do_rank_clust=True, rank_clust_names=False, **kwds):
   """From matrix file names and parameters, write resulting graphviz output to file."""
   assert cls_fname and dcor_fname and out_fname
   weighted = str_true_false(weighted)
@@ -97,6 +108,11 @@ def matrix_files_to_flat_graphviz_file(cls_fname=None, dcor_fname=None, out_fnam
   assert min_d >= 0
   if ignore_nodes is not None:
     ignore_nodes = ignore_nodes.split(',')
+  if do_rank_clust in ("F",'f','false','FALSE','None', "False", False, None):
+    do_rank_clust = False
+  else:
+    do_rank_clust = True
+    
   
   CLS_D = mio.load(cls_fname)
   DCOR_D = mio.load(dcor_fname)
@@ -104,12 +120,20 @@ def matrix_files_to_flat_graphviz_file(cls_fname=None, dcor_fname=None, out_fnam
     node_styles = load_colors_as_node_style_dict(open(color_fname))
   else:
     node_styles = None
-    
+
+  if rank_clust_names in ("F",'f','false','FALSE','None', False, None):
+    rank_clust_names = None
+  else:
+    rank_clust_names = CLS_D['row_ids']
+
   if rank_cluster_fname is not None:
-    rank_clusters = load_rank_clusters(open(rank_cluster_fname))
+    rank_clusters = load_rank_clusters(open(rank_cluster_fname), rank_clust_names)
   else:
     rank_clusters = None
   print rank_clusters
+  if not do_rank_clust:
+    print "kill ranks..."
+    rank_clusters = None
   
   assert CLS_D['row_ids'] == CLS_D['col_ids']
   assert DCOR_D['row_ids'] == DCOR_D['col_ids']

@@ -15,14 +15,18 @@ FONT_STRING = """graph [fontname = "helvetica", nodesep=0, splines=ortho, rankse
 node [fontname = "helvetica", color="#000000", style=filled, fillcolor="#ffffff"];
 edge [fontname = "helvetica", penwidth=1];"""
 
-def load_rank_clusters(fp):
+def load_rank_clusters(fp, clust_names=None):
   C = []
   for line in fp:
     line = line.strip()
     if not line: continue
     c = eval(line)
     for q in c:
-      C.append(q)
+      if not clust_names:
+        C.append(q)
+      else:
+        qq = [clust_names[int(x)-1] for x in q]
+        C.append(qq)
   return C
 
 def str_true_false(s):
@@ -111,6 +115,7 @@ def print_graphviz(names, out=sys.stdout, node_styles=None, graph_type="digraph"
   Return dict of edge and node representation
   See `yield_matrix_to_edge_dict` for additional options passed via **kwds.
   """
+  print kwds['IGNORE']
   # Print header.
   print >>out, "%s {" % (graph_type)
   if prefix: print >>out, prefix
@@ -189,7 +194,7 @@ def yield_matrix_to_edge_dict(names=None, CLS=None, DCOR=None, WEAK=None, IGNORE
       else:
         weak = None
       if IGNORE is not None:
-        ignore = IGNORE[i,j]
+        ignore = IGNORE[j,i] # WARNING: Ignore matrix is loaded as transpose! 
       else:
         ignore = None
       if weighted:
