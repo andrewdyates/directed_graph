@@ -1,0 +1,50 @@
+z@~/Dropbox/biostat/git_repos/directed_graph$ python biovis_gold_summarize_summary.py 
+Clusters
+[['1', '2', '4', '5', '7', '14']]
+[['8', '10']]
+[['3', '9', '12']]
+[['6', '11', '13']]
+
+Too low: {'directed': 29, 'total': 38, 'undirected': 9, 'filled': 47}
+# Far edges 9
+Total: {'directed': 45, 'total': 71, 'undirected': 26, 'filled': 97}
+Same Level: {'directed': 0, 'total': 15, 'undirected': 15, 'filled': 30}
+Redundant Far: {'directed': 4, 'total': 6, 'undirected': 2, 'filled': 8}
+Ignored {'directed': 33, 'total': 54, 'undirected': 21, 'filled': 75}
+75
+38
+Save Ignore Matrix at: data/biovis_gold/gold_0.32_dot_noweak_ignore_0.7.csv
+z@~/Dropbox/biostat/git_repos/directed_graph$ python biovis_gold_summarize_summary.py 
+Clusters
+[['1', '2', '4', '5', '7', '14']]
+[['8', '10']]
+[['3', '9', '12']]
+[['6', '11', '13']]
+
+Too low: {'directed': 18, 'total': 27, 'undirected': 9, 'filled': 36}
+# Far edges 17
+Total: {'directed': 45, 'total': 71, 'undirected': 26, 'filled': 97}
+Same Level: {'directed': 0, 'total': 15, 'undirected': 15, 'filled': 30}
+Redundant Far: {'directed': 13, 'total': 15, 'undirected': 2, 'filled': 17}
+Ignored {'directed': 31, 'total': 52, 'undirected': 21, 'filled': 73}
+73
+47
+Save Ignore Matrix at: data/biovis_gold/gold_0.32_dot_noweak_ignore_0.65.csv
+
+
+# at .75
+Clusters
+[['1', '2', '4', '5', '7', '14']]
+[['8', '10']]
+[['3', '9', '12']]
+[['6', '11', '13']]
+
+Too low: {'directed': 35, 'total': 44, 'undirected': 9, 'filled': 53}
+# Far edges 5
+Total: {'directed': 45, 'total': 71, 'undirected': 26, 'filled': 97}
+Same Level: {'directed': 0, 'total': 15, 'undirected': 15, 'filled': 30}
+Redundant Far: {'directed': 3, 'total': 4, 'undirected': 1, 'filled': 5}
+Ignored {'directed': 38, 'total': 58, 'undirected': 20, 'filled': 78}
+78
+35
+Save Ignore Matrix at: data/biovis_gold/gold_0.32_dot_noweak_ignore_0.75.csv

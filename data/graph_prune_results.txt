@@ -1,0 +1,5 @@
+Total: {'directed': 166, 'total': 302, 'undirected': 136, 'filled': 438}
+Same Level: {'directed': 0, 'total': 45, 'undirected': 45, 'filled': 90}
+Redundant Far: {'directed': 74, 'total': 102, 'undirected': 28, 'filled': 130}
+removed: 155
+reduction: 0.513245033113
