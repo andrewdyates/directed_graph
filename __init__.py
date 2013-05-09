@@ -194,7 +194,7 @@ def yield_matrix_to_edge_dict(names=None, CLS=None, DCOR=None, WEAK=None, IGNORE
       else:
         weak = None
       if IGNORE is not None:
-        ignore = IGNORE[j,i] # WARNING: Ignore matrix is loaded as transpose! 
+        ignore = bool(IGNORE[i,j]) | bool(IGNORE[j,i]) # IGNORE is not a symmetric matrix! ignore any edge, not just directional!
       else:
         ignore = None
       if weighted:
