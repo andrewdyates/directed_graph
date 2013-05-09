@@ -25,7 +25,7 @@ python script.py min_d=0.30 cls_fname=data/trans.cls.tab dcor_fname=data/trans.d
 python script.py min_d=0.30 cls_fname=data/trans.cls.tab dcor_fname=data/trans.dcor.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weak_fname=data/trans.weak.tab outpath_prefix=~/Desktop/alltrans_0.30_fdp
 
 # with weaks, no weights, dot
-python script.py min_d=0.30 cls_fname=data/trans.cls.tab dcor_fname=data/trans.dcor.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weak_fname=data/trans.weak.tab outpath_prefix=~/Desktop/alltrans_nw0.30_fdp weighted=False
+python script.py min_d=0.30 cls_fname=data/trans.cls.tab dcor_fname=data/trans.dcor.tab color_fname=data/gold.celegans.phase.colors.genes.txt graphviz_cmd=dot weak_fname=data/trans.weak.tab outpath_prefix=~/alltrans_nw0.30_fdp weighted=False
 """
 import matrix_io as mio
 from __init__ import *
