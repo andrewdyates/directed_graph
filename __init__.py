@@ -11,7 +11,7 @@ BOOL_ENUM = {0:'NA', 1:'XiY', 2:'PC', 3:'YiX', 4:'UNL', 5:'MX', 6:'NC', 7:'OR', 
 WEAK_ENUM = {0:'nc', 1:'and', 2:'rn4c', 3:'cn4r', 4:'xor', 5:'mix'}
 
 # GRAPHVIZ TEMPLATES
-FONT_STRING = """graph [fontname = "helvetica", nodesep=0, splines=ortho, ranksep=0.7, rank=same];
+FONT_STRING = """graph [fontname = "helvetica", nodesep=%f, splines=%s, ranksep=%f, rank=same];
 node [fontname = "helvetica", color="#000000", style=filled, fillcolor="#ffffff"];
 edge [fontname = "helvetica", penwidth=1];"""
 
@@ -110,16 +110,18 @@ def get_adj_dict(names, CLS, DCOR, WEAK=None):
   return G
 
     
-def print_graphviz(names, out=sys.stdout, node_styles=None, graph_type="digraph", prefix="", postfix="", cluster_sizes=None, rank_clusters=None, ignore_nodes=None, weak_orders=True, **kwds):
+def print_graphviz(names, out=sys.stdout, node_styles=None, graph_type="digraph", prefix="", postfix="", cluster_sizes=None, rank_clusters=None, ignore_nodes=None, weak_orders=True, spline="ortho", node_sep=0, rank_sep=0.7, **kwds):
   """Print graphviz output to `out` stream.
   Return dict of edge and node representation
   See `yield_matrix_to_edge_dict` for additional options passed via **kwds.
   """
-  print kwds['IGNORE']
+  #print kwds['IGNORE']
+  node_sep = float(node_sep)
+  rank_sep = float(rank_sep)
   # Print header.
   print >>out, "%s {" % (graph_type)
   if prefix: print >>out, prefix
-  print >>out, FONT_STRING
+  print >>out, FONT_STRING % (node_sep, spline, rank_sep)
   # strip double quotes in node names
   if ignore_nodes is not None:
     ignore_nodes = set(ignore_nodes)

@@ -10,13 +10,14 @@ import sys
 ADJ_FNAME = "data/biovis_all/may9_all_trans_0.65_dot_nw.adj.csv"
 RANKS_FNAME= "data/biovis_all/all.trans.0.65.levels.txt"
 
-IGNORE_FNAME= "data/biovis_all/all_0.32_dot_noweak_ignore_0.8.csv"
+IGNORE_FNAME= "data/biovis_all/all_0.32_dot_noweak_ignore_0.83.csv"
 DCOR_FNAME = "data/trans.dcor.tab"
 P2_FNAME = ADJ_FNAME + ".path2.csv"
 P3_FNAME = ADJ_FNAME + ".path3.csv"
-DCOR_TH = 0.8
+DCOR_TH = 0.83
 
 def main():
+  print DCOR_TH
   # 1: load adj matrix
   ADJ_D = mio.load(ADJ_FNAME, dtype=np.int, force_row_ids=True, force_col_ids=True)
   DCOR_D = mio.load(DCOR_FNAME, force_row_ids=True, force_col_ids=True)
